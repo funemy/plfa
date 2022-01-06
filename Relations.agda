@@ -182,15 +182,42 @@ data Trichotomy (m n : ℕ) : Set where
     → suc m ≤ n
     → suc n ≤ p
     → suc m ≤ p
-  helper sm≤n (s≤s {_} {n} sn≤p) =  ≤-trans (≤-trans sm≤n sn≤p) (≤-suc n)
+  helper sm≤n (s≤s {_} {p} sn≤p) =  ≤-trans (≤-trans sm≤n sn≤p) (≤-suc p)
 
 -- Predicates
 data even : ℕ → Set
 data odd : ℕ → Set
 
+-- `zero` and `suc` are overloaded constructors
 data even where
   zero : even zero
   suc : ∀ {n : ℕ} → odd n → even (suc n)
 
 data odd where
   suc : ∀ {n : ℕ} → even n → odd (suc n)
+
+-- Corresond to the mutually recursive definitions
+-- The proofs are also mutually dependent
+e+e≡e : ∀ {m n : ℕ}
+  → even m
+  → even n
+  → even (m + n)
+
+o+e≡o : ∀ {m n : ℕ}
+  → odd m
+  → even n
+  → odd (m + n)
+
+e+e≡e zero n = n
+e+e≡e (suc x) n = suc (o+e≡o x n)
+
+o+e≡o (suc x) n = suc (e+e≡e x n)
+
+o+o≡e : ∀ {m n : ℕ}
+  → odd m
+  → odd n
+  → even (m + n)
+o+o≡e (suc {m'} m) (suc {n'} n) 
+  rewrite +-comm m' (suc n') 
+  | +-comm n' m'
+  = suc (suc (e+e≡e m n))
