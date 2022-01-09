@@ -32,8 +32,8 @@ open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _∸_; _^_)
 +-identityʳ (suc m) = cong suc (+-identityʳ m)
 
 -- Using `_` to infer explicit argument
-+-identityʳ′ : ∀ {m : ℕ} → m + zero ≡ m
-+-identityʳ′ = +-identityʳ _
++-identityʳ' : ∀ {m : ℕ} → m + zero ≡ m
++-identityʳ' = +-identityʳ _
 
 +-suc : ∀ (m n : ℕ) → m + suc n ≡ suc (m + n)
 +-suc zero n = refl

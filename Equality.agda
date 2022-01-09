@@ -90,17 +90,102 @@ trans' {A} {x} {y} {z} x≡y y≡z =
     z
   ∎
 
-module ≤-Reasoning {A : Set} where
-  infix 1 begin_
-  infixr 2 _≤⟨⟩_ _≤⟨_⟩_
-  infix 3 _∎
+open import Data.Nat using (ℕ; zero; suc; _+_)
+open import plfa.Relations using (_≤_; z≤n; s≤s; ≤-trans; ≤-refl)
 
-  -- begin_
+-- NOTE: We cannot use the +-comm and +-identityʳ defined in the previous chapter
+-- Because they use the builtin ≡ from standard library
+-- Using `postulate` to avoid redefining everything
+postulate
+  +-identityʳ : ∀ (m : ℕ) → m + zero ≡ m
+  +-suc : ∀ (m n : ℕ) → m + suc n ≡ suc (m + n)
 
-  -- _≤⟨⟩_
+-- redefine commutativity of +
++-comm : ∀ (m n : ℕ) → m + n ≡ n + m
++-comm m zero = +-identityʳ m
++-comm m (suc n) =
+  begin
+    m + (suc n)
+  ≡⟨ +-suc m n ⟩
+    suc (m + n)
+  ≡⟨ cong suc (+-comm m n) ⟩
+    suc (n + m)
+  ≡⟨⟩
+    (suc n) + m
+  ∎
 
-  -- _≤⟨_⟩_
+module ≤-Reasoning where
+  infix 1 ≤begin_
+  infixr 2 _≤⟨⟩_ _≤⟨_⟩_ _≡≤⟨_⟩_
+  infix 3 _≤∎
 
-  -- _∎
+  ≤begin_ : ∀ {x y : ℕ}
+    → x ≤ y
+    → x ≤ y
+  ≤begin x≤y = x≤y
+
+  _≤⟨⟩_ : ∀ (x : ℕ) {y : ℕ}
+    → x ≤ y
+    → x ≤ y
+  x ≤⟨⟩ x≤y = x≤y
+
+  _≤⟨_⟩_ : ∀ (x : ℕ) {y z : ℕ}
+    → x ≤ y
+    → y ≤ z
+    → x ≤ z
+  x ≤⟨ x≤y ⟩ y≤z = ≤-trans x≤y y≤z
+
+  _≡≤⟨_⟩_ : ∀ (x : ℕ) {y z : ℕ}
+    → x ≡ y
+    → y ≤ z
+    → x ≤ z
+  x ≡≤⟨ refl ⟩ y≤z = y≤z
+
+  _≤∎ : ∀ (x : ℕ)
+    → x ≤ x
+  x ≤∎ = ≤-refl
 
 open ≤-Reasoning
+
++-monoʳ-≤' : ∀ (n p q : ℕ)
+  → p ≤ q
+  → n + p ≤ n + q
++-monoʳ-≤' zero p q p≤q =
+  ≤begin
+    zero + p
+  ≤⟨ p≤q ⟩
+    zero + q
+  ≤∎
++-monoʳ-≤' (suc n) p q p≤q =
+  ≤begin
+    suc n + p
+  ≤⟨ s≤s (+-monoʳ-≤' n p q p≤q) ⟩
+    suc n + q
+  ≤∎
+
++-monoˡ-≤' : ∀ (m n p : ℕ)
+  → m ≤ n
+  → m + p ≤ n + p
++-monoˡ-≤' m n p m≤n =
+  ≤begin
+    m + p
+  ≡≤⟨ +-comm m p ⟩
+    p + m
+  ≤⟨ +-monoʳ-≤' p m n m≤n ⟩
+    p + n
+  ≡≤⟨ +-comm p n ⟩
+    n + p
+  ≤∎
+
++-mono-≤' : ∀ (m n p q : ℕ)
+  → m ≤ n
+  → p ≤ q
+  → m + p ≤ n + q
++-mono-≤' m n p q m≤n p≤q =
+  ≤begin
+    m + p
+  ≤⟨ +-monoˡ-≤' m n p m≤n ⟩
+    n + p
+  ≤⟨ +-monoʳ-≤' n p q p≤q ⟩
+    n + q
+  ≤∎

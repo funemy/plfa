@@ -217,7 +217,7 @@ o+o≡e : ∀ {m n : ℕ}
   → odd m
   → odd n
   → even (m + n)
-o+o≡e (suc {m'} m) (suc {n'} n) 
-  rewrite +-comm m' (suc n') 
+o+o≡e (suc {m'} m) (suc {n'} n)
+  rewrite +-comm m' (suc n')
   | +-comm n' m'
   = suc (suc (e+e≡e m n))
