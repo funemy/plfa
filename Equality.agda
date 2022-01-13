@@ -306,6 +306,7 @@ sym-≐ {A} {x} {y} x≐y P = Qy
     Qy : Q y
     Qy = x≐y Q Qx
 
+-- NOTE:
 -- Thoughts, since Leibniz equality is universally quantified over a property P
 -- Our proof structure is to try comming up with a concrete P that has the shape of our proof goal.
 
