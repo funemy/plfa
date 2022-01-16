@@ -43,6 +43,7 @@ same = extensionality λ m → extensionality λ n → same-app m n
 
 -- More generic extensionality
 postulate
+  -- NOTE: I think here ∀ is just for explicity, but doesn't really change the meaning of the propositiion?
   ∀-extensionality : ∀ {A : Set} {B : A → Set} {f g : ∀ (x : A) → B x}
     → (∀ (x : A) → f x ≡ g x)
     → f ≡ g
